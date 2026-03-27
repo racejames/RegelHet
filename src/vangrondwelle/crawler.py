@@ -8,6 +8,8 @@ from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 
+from .app_metadata import USER_AGENT
+
 LOGGER = logging.getLogger(__name__)
 DISCOVERY_KEYWORDS = (
     "contact",
@@ -68,11 +70,7 @@ def _fetch_url(
         extra={"request_id": request_id, "domain": domain, "url": url},
     )
     try:
-        response = session.get(
-            url,
-            timeout=timeout,
-            headers={"User-Agent": "vanGrondwelle/0.1 (+https://github.com/racejames/vanGrondwelle)"},
-        )
+        response = session.get(url, timeout=timeout, headers={"User-Agent": USER_AGENT})
         LOGGER.info(
             "Fetched page response.",
             extra={

@@ -7,6 +7,7 @@ from collections.abc import Iterable
 
 import requests
 
+from .app_metadata import USER_AGENT
 from .business_compare import BusinessComparisonRow
 from .normalize import normalize_text
 
@@ -14,7 +15,6 @@ LOGGER = logging.getLogger(__name__)
 OVERPASS_API_URL = "https://overpass-api.de/api/interpreter"
 GOOGLE_PLACES_URL = "https://places.googleapis.com/v1/places:searchText"
 KVK_SEARCH_URL = "https://api.kvk.nl/api/v2/zoeken"
-USER_AGENT = "vanGrondwelle/0.1 (+https://github.com/racejames/vanGrondwelle)"
 
 
 def build_business_comparison(

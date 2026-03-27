@@ -1,6 +1,8 @@
-# vanGrondwelle
+# RegelHet
 
-CLI scraper for collecting basic contact details from Dutch healthcare provider websites and for comparing business-source quality across Dutch directory providers.
+RegelHet is a CLI scraper for collecting basic contact details from Dutch healthcare provider websites and for comparing business-source quality across Dutch directory providers.
+
+The internal Python package and CLI module path remain `vangrondwelle` for compatibility during the rename.
 
 ## What it does
 
