@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from vangrondwelle import service
+from vangrondwelle import business_sources, crawler, service
 from vangrondwelle.crawler import CrawledPage
 
 
@@ -29,3 +29,8 @@ def test_scrape_domain_returns_best_contact_page(monkeypatch) -> None:
     assert result.source_url == "https://voorbeeldzorg.nl/contact"
     assert result.phone == "0201234567"
     assert result.email == "info@voorbeeldzorg.nl"
+
+
+def test_public_user_agents_use_the_renamed_repo_url() -> None:
+    assert "RegelHet" in business_sources.USER_AGENT
+    assert "RegelHet" in crawler.USER_AGENT

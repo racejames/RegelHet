@@ -4,6 +4,7 @@
 - Added OpenStreetMap, Google Places, and Google Places plus KVK scenario handling.
 - Added a side-by-side table renderer and a new `compare-business` CLI command.
 - Added documentation for the new demo flow and feature registry entries.
+- Updated the visible product branding to `RegelHet` while keeping the internal package name stable as `vangrondwelle`.
 
 ## How to test locally
 
