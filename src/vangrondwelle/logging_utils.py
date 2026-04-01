@@ -22,6 +22,14 @@ class JsonFormatter(logging.Formatter):
             payload["url"] = record.url
         if hasattr(record, "status_code"):
             payload["status_code"] = record.status_code
+        if hasattr(record, "provider"):
+            payload["provider"] = record.provider
+        if hasattr(record, "location"):
+            payload["location"] = record.location
+        if hasattr(record, "business_name"):
+            payload["business_name"] = record.business_name
+        if hasattr(record, "scenario"):
+            payload["scenario"] = record.scenario
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
         return json.dumps(payload, ensure_ascii=True)
@@ -33,5 +41,4 @@ def configure_logging(verbose: bool) -> None:
     root_logger = logging.getLogger()
     root_logger.handlers.clear()
     root_logger.addHandler(handler)
-    root_logger.setLevel(logging.DEBUG if verbose else logging.INFO)
-    logging.getLogger("urllib3").setLevel(logging.INFO)
+    root_logger.setLevel(logging.DEBUG if verbose else logging.WARNING)

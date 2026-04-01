@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "vangrondwelle"
 version = "0.1.0"
-description = "CLI scraper for extracting contact details from Dutch healthcare provider websites."
+description = "RegelHet CLI scraper for extracting contact details and comparing Dutch business data sources."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
