@@ -11,6 +11,11 @@ from .normalize import normalize_email, normalize_phone, normalize_text
 EMAIL_RE = re.compile(r"\b[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[A-Za-z]{2,}\b")
 PHONE_RE = re.compile(r"(?:(?:\+31|0031|0)\s*(?:\(0\)\s*)?(?:[\d\s\-()]){8,}\d)")
 POSTCODE_RE = re.compile(r"\b\d{4}\s?[A-Z]{2}\b")
+STREET_NAME_RE = r"(?:[A-ZÀ-ÿ][A-Za-zÀ-ÿ'’.\-]*\s){0,1}[A-ZÀ-ÿ][A-Za-zÀ-ÿ'’.\-]*(?:straat|laan|plein|weg|gracht|hof|kade|markt|park|plantsoen|boulevard|singel|dreef|steeg)"
+ADDRESS_RE = re.compile(
+    rf"({STREET_NAME_RE}\s+\d+[A-Za-z]?(?:[-/]\d+[A-Za-z]?)?(?:,\s*|\s+)\d{{4}}\s?[A-Z]{{2}}(?:,\s*|\s+)[A-ZÀ-ÿ][A-Za-zÀ-ÿ'’.\- ]+)",
+    re.IGNORECASE,
+)
 ADDRESS_HINTS = (
     "straat",
     "laan",
@@ -56,7 +61,7 @@ def extract_contact_info(html: str, domain: str, source_url: str) -> ContactInfo
 
 
 def _iter_text_chunks(soup: BeautifulSoup) -> Iterable[str]:
-    for node in soup.find_all(["p", "li", "div", "span", "address"]):
+    for node in soup.find_all(["p", "li", "span", "address", "td"]):
         text = normalize_text(node.get_text(" ", strip=True))
         if text:
             yield text
@@ -65,9 +70,21 @@ def _iter_text_chunks(soup: BeautifulSoup) -> Iterable[str]:
 def _find_addresses(chunks: list[str]) -> list[str]:
     matches: list[str] = []
     for chunk in chunks:
+        for raw_match in ADDRESS_RE.findall(chunk):
+            candidate = normalize_text(raw_match)
+            if candidate:
+                matches.append(candidate)
+
         if not POSTCODE_RE.search(chunk):
             continue
-        candidate = normalize_text(chunk)
+
+        postcode_match = POSTCODE_RE.search(chunk)
+        if postcode_match is None:
+            continue
+
+        snippet_start = max(0, postcode_match.start() - 60)
+        snippet_end = min(len(chunk), postcode_match.end() + 60)
+        candidate = normalize_text(chunk[snippet_start:snippet_end])
         if not candidate:
             continue
         lowered = candidate.lower()

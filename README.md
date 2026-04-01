@@ -12,7 +12,7 @@ The first version crawls a small set of likely contact pages on a provider domai
 - central phone number
 - central email address
 
-The scraper returns JSON so the output can be piped into other tools later.
+The scraper returns JSON or CSV so the output can be piped into other tools later.
 
 The repository also includes a comparison demo for checking how one target business appears across:
 
@@ -55,5 +55,6 @@ python -m pytest
 
 - The crawler stays on the same domain and only follows a small number of contact-oriented pages.
 - Extraction uses heuristics, so some sites will need future rule tuning.
+- The Den Haag seed flow is based on organization entries from ZorgkaartNederland that expose an external provider website.
 - Logs are emitted as JSON on stderr when `--verbose` is enabled.
 - The comparison demo uses OpenStreetMap as the open-source source for scenario 1.

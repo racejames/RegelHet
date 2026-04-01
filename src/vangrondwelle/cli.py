@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import argparse
-import json
-import sys
 
 from .business_compare import render_comparison_table
 from .business_sources import build_business_comparison
 from .logging_utils import configure_logging
-from .service import scrape_domain
+from .output import write_results
+from .service import scrape_domain, scrape_seeds
 
 
 def build_domain_parser() -> argparse.ArgumentParser:
@@ -17,8 +16,39 @@ def build_domain_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "domains",
-        nargs="+",
+        nargs="*",
         help="One or more provider domains, for example ziekenhuis.nl or https://www.zorginstelling.nl.",
+    )
+    parser.add_argument(
+        "--discover-den-haag",
+        action="store_true",
+        help="Discover organization websites from the public ZorgkaartNederland Den Haag listings and scrape them.",
+    )
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        help="Limit the number of Den Haag directory pages to process during discovery.",
+    )
+    parser.add_argument(
+        "--max-providers",
+        type=int,
+        help="Limit the number of discovered provider websites to scrape.",
+    )
+    parser.add_argument(
+        "--format",
+        choices=("json", "csv"),
+        default="json",
+        help="Output format.",
+    )
+    parser.add_argument(
+        "--output",
+        help="Optional file path for writing the output payload.",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=6,
+        help="Maximum number of concurrent website scrapes for discovery mode.",
     )
     parser.add_argument(
         "--pretty",
@@ -70,9 +100,18 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(args_list)
     configure_logging(args.verbose)
 
-    results = [scrape_domain(domain).to_dict() for domain in args.domains]
-    json.dump(results, sys.stdout, indent=2 if args.pretty else None)
-    sys.stdout.write("\n")
+    if args.discover_den_haag:
+        seeds = discover_den_haag_provider_seeds(
+            max_pages=args.max_pages,
+            max_providers=args.max_providers,
+        )
+        results = scrape_seeds(seeds, max_workers=args.workers)
+    else:
+        if not args.domains:
+            parser.error("domains are required unless --discover-den-haag is used")
+        results = [scrape_domain(domain) for domain in args.domains]
+
+    write_results(results, output_format=args.format, output_path=args.output, pretty=args.pretty)
     return 0
 
 

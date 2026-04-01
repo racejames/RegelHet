@@ -14,9 +14,15 @@ def test_scrape_domain_returns_best_contact_page(monkeypatch) -> None:
     home_page = read_fixture("home_page.html")
     contact_page = read_fixture("contact_page.html")
 
-    def fake_crawl_contact_pages(domain: str, request_id: str) -> list[CrawledPage]:
+    def fake_crawl_contact_pages(
+        domain: str,
+        request_id: str,
+        *,
+        start_url: str | None = None,
+    ) -> list[CrawledPage]:
         assert domain == "voorbeeldzorg.nl"
         assert request_id
+        assert start_url == "https://voorbeeldzorg.nl"
         return [
             CrawledPage(url="https://voorbeeldzorg.nl", html=home_page),
             CrawledPage(url="https://voorbeeldzorg.nl/contact", html=contact_page),

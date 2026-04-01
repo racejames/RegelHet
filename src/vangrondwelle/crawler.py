@@ -31,13 +31,14 @@ def crawl_contact_pages(
     domain: str,
     request_id: str,
     *,
+    start_url: str | None = None,
     session: requests.Session | None = None,
     max_pages: int = 8,
     timeout: int = 12,
 ) -> list[CrawledPage]:
     client = session or requests.Session()
-    start_url = f"https://{domain}"
-    queue = deque([start_url])
+    first_url = start_url or f"https://{domain}"
+    queue = deque([first_url])
     visited: set[str] = set()
     pages: list[CrawledPage] = []
 
@@ -104,6 +105,8 @@ def _discover_contact_links(html: str, base_url: str, domain: str) -> list[str]:
             continue
         absolute = urljoin(base_url, href)
         parsed = urlparse(absolute)
+        if parsed.scheme and parsed.scheme not in ("http", "https"):
+            continue
         if parsed.netloc and parsed.netloc.lower().removeprefix("www.") != domain:
             continue
         matches.append(absolute.split("#", 1)[0])
